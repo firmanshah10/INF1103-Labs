@@ -21,3 +21,13 @@ print("Day 2:", followers)
 
 followers -= 10
 print("Day 3:", followers)
+
+username = input("Input Username: ")
+age = input("Enter age: ")
+category = input("Enter Content Category: ")
+
+print("\nInstagram Profile")
+print("=====================")
+print("Username:", username)
+print("age:", age)
+print("Category:", category)
