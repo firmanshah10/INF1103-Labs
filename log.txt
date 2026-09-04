@@ -1,0 +1,23 @@
+commit 24318f9da54d242ccf47d6883c6ffe3f66acb465
+Author: Firman Shah <frenkiefir22@gmail.com>
+Date:   Thu Sep 3 17:26:47 2026 +0800
+
+    YOU ARE TOO OLD COMMIT
+
+commit ce76122dddbcd8f24e2599b92e54c8f61c984b7b
+Author: Firman Shah <frenkiefir22@gmail.com>
+Date:   Thu Sep 3 17:19:40 2026 +0800
+
+    Dynamic Profile
+
+commit c02555cfd0e2a4ba23ac7952d6f4bad0d639cef8
+Author: Firman Shah <frenkiefir22@gmail.com>
+Date:   Thu Sep 3 17:14:30 2026 +0800
+
+    Assignment Variables
+
+commit 1ac0d4abf0e6094af0db8577af5a73289f88468f
+Author: Firman Shah <frenkiefir22@gmail.com>
+Date:   Thu Sep 3 17:06:16 2026 +0800
+
+    First Post
