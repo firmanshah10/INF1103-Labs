@@ -12,8 +12,11 @@ while True:
             print("You have exceeded the maximum stock limit of 500")
             break
     else:
-        print("Invalid input. Please enter a valid number or quit: ")
+        print("Invalid input. Ple49" \
+        "Please enter a valid number or quit: ")
         rejected +=1
+print("Total Stock Quantity: ", total)
+print("Rejected Entries: ", rejected)
 
 
 
