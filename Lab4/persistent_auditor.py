@@ -41,7 +41,7 @@ def load_inventory():
     return orders
 
 def save_inventory(orders):
-    with open('inventorhy.txt', 'w') as file:
+    with open('inventory.txt', 'w') as file:
         for order in orders:
             file.write(f'{order[0]}, {order[1]}, {order[2]}\n')
     print(f'Order successfully added to inventory.txt')
