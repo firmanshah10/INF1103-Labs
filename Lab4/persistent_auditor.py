@@ -18,22 +18,29 @@ def calculate_tax(amount):
     tax = amount * 0.1
     return tax
 
-def generate_report(total_unit,failed_attemps):
-    print(f'Total Deliveries Processed: {total_unit}')
+def generate_report(process_delivery,total_unit,failed_attemps):
+    print(f'Total Transactions Recorded: {total_unit}')
+    print(f'Total Deliveries Processed: {process_delivery}')
     print(f'Number of Failed Entries: {failed_attemps}')
 
 def load_inventory():
+    orders = []
     try:
         with open('inventory.txt', 'r') as file:
-            data = file.read()
-            print(data)
+            print('Current Orders: ')
+            for line in file:
+                line = line.strip()
+                if line:
+                    print(line)
+                    orders.append(line.split(', '))
     except FileNotFoundError:
         print('File not found, creating new Inventory file...')
-        with open('inventoryy.txt', 'a') as file:
-            data = file.write()
+    return orders
 
 def save_inventory():
-    x
+    with open('inventorhy.txt', 'w') as file:
+        data = file.write()
+
 
 total = 0
 deliveries = 0
@@ -48,5 +55,5 @@ while True:
     tax = calculate_tax(result)
     deliveries += 1
 
-generate_report(deliveries, rejected)
+generate_report(total, deliveries, rejected)
 
