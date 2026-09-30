@@ -1,11 +1,14 @@
 def get_valid_input():
     failed = 0
+    name = input('Enter Product Name: ')
+    if name == 'quit':
+        return('quit', None), failed
     while True:
         entry = input("Enter a stock quantity (or quit): ")
         if entry == "quit":
             return "quit", failed
         if entry.isdigit():
-            return int(entry), failed
+            return (name,int(entry)), failed
         else:
             print("Invalid input, please enter a valid input")
             failed += 1
@@ -34,26 +37,41 @@ def load_inventory():
                     print(line)
                     orders.append(line.split(', '))
     except FileNotFoundError:
-        print('File not found, creating new Inventory file...')
+        print('File not found')
     return orders
 
-def save_inventory():
+def save_inventory(orders):
     with open('inventorhy.txt', 'w') as file:
-        data = file.write()
+        for order in orders:
+            file.write(f'{order[0]}, {order[1]}, {order[2]}\n')
+    print(f'Order successfully added to inventory.txt')
 
-
+orders = load_inventory()
 total = 0
 deliveries = 0
 rejected = 0
 
 while True:
-    result, failed = get_valid_input()
-    rejected+= failed
-    if result == "quit":
+    (item_info), failed = get_valid_input()
+    rejected += failed
+    
+    if item_info[0] == "quit":
         break
-    total = process_delivery(total, result)
-    tax = calculate_tax(result)
+        
+    product_name, quantity = item_info
+    next_id = 1001 + len(orders)
+    
+    new_order = [str(next_id), product_name, str(quantity)]
+    orders.append(new_order)
+    
+    print("\nNew Order Added:")
+    print(f"{new_order[0]}, {new_order[1]}, {new_order[2]}")
+    
+    save_inventory(orders)
+    
+    total = process_delivery(total, quantity)
+    tax = calculate_tax(quantity)
     deliveries += 1
 
-generate_report(total, deliveries, rejected)
+generate_report(deliveries, total, rejected)
 
