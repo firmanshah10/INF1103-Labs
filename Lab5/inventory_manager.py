@@ -43,7 +43,23 @@ def update_stock():
                 else:
                     print("Invalid quantity, please enter a number")
             inv['stock'] = int_stock
+def search_product():
+    print("Search Product")
+    search_id = input("Enter Product ID: ")
+    for inv in inventory:
+        if search_id == inv['id']:
+            print("Product Found")
+            print("--------------------------")
+            print(f"ID: {inv['id']}")
+            print(f"Name: {inv['name']}")
+            print(f"Price: {inv['price']}")
+            print(f"Stock: {inv['stock']}")
+            print("--------------------------")
+            break
+    else:
+        print("Product not found")
 
-update_stock()
+search_product()
+#update_stock()
 #add_product()
 #display_all()
