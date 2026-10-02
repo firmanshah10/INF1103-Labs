@@ -27,5 +27,23 @@ def add_product():
     new_product = {"id":product_id, "name": product_name, "price":float_price, "stock":int_quantity}
     inventory.append(new_product)
 
-add_product()
-display_all()
+def update_stock():
+    print("Update Stock:  ")
+    search_id = input("Enter Product ID:")
+    for inv in inventory:
+        if search_id == inv['id']:
+            print("Product Found: ")
+            print(f"Name: {inv['name']}")
+            print(f"Current Stock: {inv['stock']}")
+            while True:
+                new_stock = input("New Stock Quantity: ")
+                if new_stock.isdigit():
+                    int_stock = int(new_stock)
+                    break
+                else:
+                    print("Invalid quantity, please enter a number")
+            inv['stock'] = int_stock
+
+update_stock()
+#add_product()
+#display_all()
