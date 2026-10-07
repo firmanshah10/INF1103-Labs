@@ -21,7 +21,9 @@ def save_inventory(inventory):
     print("Inventory saved successfully to inventory.json.")
 
 def display_all(inventory):
+    print("------------------------------")
     print("\nCurrent Inventory")
+    print("------------------------------")
     for inv in inventory:
         print(f"ID: {inv['id']} | Name: {inv['name']} | Price: ${inv['price']:.2f} | Stock: {inv['stock']}")
 
@@ -85,11 +87,13 @@ def search_product(inventory):
         print("\nProduct not found")
 
 def main():
+    print("===================================")
     print("INVENTORY MANAGEMENT SYSTEM")
+    print("===================================")
     inventory = load_inventory()
 
     while True:
-        print("\nMENU")
+        print("\n-------- MENU --------")
         print("1. Display All Products")
         print("2. Add Product")
         print("3. Update Stock")
