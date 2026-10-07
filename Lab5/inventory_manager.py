@@ -1,4 +1,26 @@
+import json
+
 inventory = [{"id": 'P001','name':'Laptop','price':1000,'stock':40},{"id": 'P002','name':'Mouse','price':30,'stock':30},{"id": 'P003','name':'Keyboard','price':45,'stock':89}]
+
+def load_inventory():
+    try:
+        with open('inventory.json', 'r') as file:
+            print("inventory.json found.")
+            data = json.load(file)
+            print("Inventory loaded successfully.")
+            return data
+    except FileNotFoundError:
+        print("inventory.json not found. Starting with default inventory.")
+        # 3 default products
+        return [
+            {"id": "P001", "name": "Laptop", "price": 1000, "stock": 40},
+            {"id": "P002", "name": "Mouse", "price": 30, "stock": 30},
+            {"id": "P003", "name": "Keyboard", "price": 45, "stock": 89}
+        ]
+    def save_inventory():
+        with open('inventory.json', 'w') as file:
+            json.dump(inventory, file, indent=4)
+    print("Inventory saved successfully to inventory.json.")
 
 def display_all():
     for inv in inventory:
