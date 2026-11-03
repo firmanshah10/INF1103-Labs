@@ -98,12 +98,7 @@ def main():
     print("===================================")
     print("INVENTORY MANAGEMENT SYSTEM (OOP)")
     print("===================================")
-    inventory = Inventory()
-    
-    #default products using product class
-    inventory.add_product(Product("P001", "Laptop", 1200.00, 15))
-    inventory.add_product(Product("P002", "Mouse", 25.50, 40))
-    inventory.add_product(Product("P003", "Keyboard", 45.00, 25))
+    inventory = load_inventory()
 
     while True:
         print("\n-------- MENU --------")
@@ -111,7 +106,8 @@ def main():
         print("2. Add Product")
         print("3. Update Stock")
         print("4. Search Product")
-        print("5. Exit")
+        print("5. Save Inventory")
+        print("6. Exit")
 
         choice = input("Enter option: ").strip()
 
@@ -172,11 +168,17 @@ def main():
                 print("\nProduct not found.")
 
         elif choice == '5':
-            print("\nThank you for using Inventory Management System.")
-            print("Program terminated.")
-            break
+                   print("Saving inventory...")
+                   save_inventory(inventory)
+       
+        elif choice == '6':
+                   print("\nSaving inventory before exit...")
+                   save_inventory(inventory)
+                   print("\nThank you for using Inventory Management System.")
+                   print("Program terminated.")
+                   break
         else:
-            print("Invalid option, please choose between 1 and 5.")
+                   print("Invalid option, please choose between 1 and 6.")
 
 if __name__ == "__main__":
     main()
