@@ -61,3 +61,90 @@ class Inventory:
         print("------------------------------")
         for prod in self.products:
             prod.display_information()
+
+def main():
+    print("===================================")
+    print("INVENTORY MANAGEMENT SYSTEM (OOP)")
+    print("===================================")
+    inventory = Inventory()
+    
+    #default products using product class
+    inventory.add_product(Product("P001", "Laptop", 1200.00, 15))
+    inventory.add_product(Product("P002", "Mouse", 25.50, 40))
+    inventory.add_product(Product("P003", "Keyboard", 45.00, 25))
+
+    while True:
+        print("\n-------- MENU --------")
+        print("1. Display All Products")
+        print("2. Add Product")
+        print("3. Update Stock")
+        print("4. Search Product")
+        print("5. Exit")
+
+        choice = input("Enter option: ").strip()
+
+        if choice == '1':
+            inventory.display_all()
+        elif choice == '2':
+            print("\nAdd New Product\n")
+            product_id = input("Product ID: ").strip()
+            product_name = input("Product Name: ").strip()
+            while True:
+                product_price = input("Price: ")
+                try:
+                    float_price = float(product_price)
+                    break
+                except ValueError:
+                    print("Invalid price, please type a number: ")
+            while True:
+                stock_quantity = input("Stock Quantity: ")
+                if stock_quantity.isdigit():
+                    int_quantity = int(stock_quantity)
+                    break
+                else:
+                    print("Invalid quantity, please type a number")
+            
+            new_product = Product(product_id, product_name, float_price, int_quantity)
+            inventory.add_product(new_product)
+            print("Product added successfully!")
+
+        elif choice == '3':
+            print("\nUpdate Stock")
+            search_id = input("Enter Product ID: ").strip()
+            prod = inventory.search_product(search_id)
+            if prod:
+                print("\nProduct Found:")
+                print(f"Name: {prod.name}")
+                print(f"Current Stock: {prod.stock}\n")
+                while True:
+                    new_stock = input("New Stock Quantity: ")
+                    if new_stock.isdigit():
+                        prod.update_stock(int(new_stock))
+                        print("\nStock updated successfully!")
+                        break
+                    else:
+                        print("Invalid quantity, please enter a number")
+            else:
+                print("Product not found.")
+
+        elif choice == '4':
+            print("\nSearch Product")
+            search_id = input("Enter Product ID: ").strip()
+            prod = inventory.search_product(search_id)
+            if prod:
+                print("\nProduct Found")
+                print("--------------------------")
+                prod.display_information()
+                print("--------------------------")
+            else:
+                print("\nProduct not found.")
+
+        elif choice == '5':
+            print("\nThank you for using Inventory Management System.")
+            print("Program terminated.")
+            break
+        else:
+            print("Invalid option, please choose between 1 and 5.")
+
+if __name__ == "__main__":
+    main()
