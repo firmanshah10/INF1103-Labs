@@ -92,3 +92,27 @@ class digitalproduct(product):
         data["type"] = "digital"
         data["download_size"] = self._download_size
         return data
+
+class inventory:
+    """manage the collection of prod objects"""
+    def __init__(self):
+        self.products = []
+
+    def add_product(self, product):
+        self.products.append(product)
+
+    def search_product(self, product_id):
+        for prod in self.products:
+            if prod.product_id == product_id:
+                return prod
+        return None
+
+    def display_all(self):
+        if not self.products:
+            print("\nInventory is empty.")
+            return
+        print("--------------------------------------------------------------------------------")
+        print("\nCurrent Inventory")
+        print("--------------------------------------------------------------------------------")
+        for prod in self.products:
+            prod.display_information()
