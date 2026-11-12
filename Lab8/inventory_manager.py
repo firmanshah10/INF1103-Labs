@@ -60,3 +60,52 @@ class Product(ABC):
                 "contact_email": self.supplier.contact_email
             }
         }
+
+class PhysicalProduct(Product, CanBeShipped):
+    """subclass representing a physical product"""
+    def __init__(self, product_id: str, name: str, price: float, stock: int, supplier: Supplier, weight: float):
+        super().__init__(product_id, name, price, stock, supplier)
+        self._weight: float = float(weight)
+
+    @property
+    def weight(self) -> float:
+        return self._weight
+
+    def get_fulfilment_info(self) -> str:
+        return "Product requires physical shipping."
+
+    def calculate_shipping_cost(self) -> float:
+        return 5.0 + (self._weight * 2.0)
+
+    def display_information(self) -> None:
+        super().display_information()
+        print(f" | Type: Physical | Weight: {self._weight}kg | Shipping: ${self.calculate_shipping_cost():.2f} | Fulfilment: {self.get_fulfilment_info()}")
+
+    def to_dict(self) -> dict:
+        data = super().to_dict()
+        data["type"] = "physical"
+        data["weight"] = self._weight
+        return data
+
+class DigitalProduct(Product):
+    """subclass representing a digital product"""
+    def __init__(self, product_id: str, name: str, price: float, stock: int, supplier: Supplier, download_size: float):
+        super().__init__(product_id, name, price, stock, supplier)
+        self._download_size: float = float(download_size)
+
+    @property
+    def download_size(self) -> float:
+        return self._download_size
+
+    def get_fulfilment_info(self) -> str:
+        return "Product is delivered digitally via download link."
+
+    def display_information(self) -> None:
+        super().display_information()
+        print(f" | Type: Digital | Download Size: {self._download_size}MB | Fulfilment: {self.get_fulfilment_info()}")
+
+    def to_dict(self) -> dict:
+        data = super().to_dict()
+        data["type"] = "digital"
+        data["download_size"] = self._download_size
+        return data
