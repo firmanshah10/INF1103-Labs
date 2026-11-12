@@ -109,3 +109,34 @@ class DigitalProduct(Product):
         data["type"] = "digital"
         data["download_size"] = self._download_size
         return data
+
+class OrderLine:
+    """order line item"""
+    def __init__(self, product: Product, quantity: int):
+        self.product: Product = product
+        self.quantity: int = int(quantity)
+
+    def calculate_subtotal(self) -> float:
+        return self.product.price * self.quantity
+
+    def display_order_line(self) -> None:
+        print(f"  - {self.product.name} x {self.quantity} @ ${self.product.price:.2f} each = Subtotal: ${self.calculate_subtotal():.2f}")
+
+class Order:
+    """customer order containing order lines"""
+    def __init__(self, order_id: str):
+        self.order_id: str = order_id
+        self.order_lines: list[OrderLine] = []
+
+    def add_order_line(self, product: Product, quantity: int) -> None:
+        order_line = OrderLine(product, quantity)
+        self.order_lines.append(order_line)
+
+    def calculate_total(self) -> float:
+        return sum(line.calculate_subtotal() for line in self.order_lines)
+
+    def display_order(self) -> None:
+        print(f"\nOrder ID: {self.order_id}")
+        for line in self.order_lines:
+            line.display_order_line()
+        print(f"Total Order Value: ${self.calculate_total():.2f}")
