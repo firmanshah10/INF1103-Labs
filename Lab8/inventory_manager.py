@@ -1,5 +1,6 @@
 import json
 from abc import ABC, abstractmethod
+from typing import Optional
 
 class CanBeShipped(ABC):
     """interface contract"""
@@ -152,7 +153,7 @@ class Inventory:
     def remove_product(self, product_id: str) -> None:
         self.products = [p for p in self.products if p.product_id != product_id]
 
-    def find_product(self, product_id: str) -> Product | None:
+    def find_product(self, product_id: str) -> Optional[Product]:
         for prod in self.products:
             if prod.product_id == product_id:
                 return prod
@@ -208,7 +209,7 @@ def save_inventory(inventory: Inventory) -> None:
 
 def main() -> None:
     print("==================================================")
-    print("INVENTORY MANAGEMENT SYSTEM (LAB 8 - RELATIONS)")
+    print("INVENTORY MANAGEMENT SYSTEM")
     print("==================================================")
     inventory = load_inventory()
 
