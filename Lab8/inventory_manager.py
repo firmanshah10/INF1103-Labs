@@ -140,3 +140,189 @@ class Order:
         for line in self.order_lines:
             line.display_order_line()
         print(f"Total Order Value: ${self.calculate_total():.2f}")
+
+class Inventory:
+    """manage collection of Product objects"""
+    def __init__(self):
+        self.products: list[Product] = []
+
+    def add_product(self, product: Product) -> None:
+        self.products.append(product)
+
+    def remove_product(self, product_id: str) -> None:
+        self.products = [p for p in self.products if p.product_id != product_id]
+
+    def find_product(self, product_id: str) -> Product | None:
+        for prod in self.products:
+            if prod.product_id == product_id:
+                return prod
+        return None
+
+    def display_all(self) -> None:
+        if not self.products:
+            print("\nInventory is empty.")
+            return
+        print("--------------------------------------------------------------------------------")
+        print("\nCurrent Inventory")
+        print("--------------------------------------------------------------------------------")
+        for prod in self.products:
+            prod.display_information()
+            print(f"  -> Fulfilment Test: {prod.get_fulfilment_info()}")
+
+def load_inventory() -> Inventory:
+    inv = Inventory()
+    try:
+        with open('inventory.json', 'r') as file:
+            print("inventory.json found.")
+            data = json.load(file)
+            print("Inventory loaded successfully.")
+            for item in data:
+                sup_data = item.get("supplier", {"supplier_id": "S999", "name": "Default Supplier", "contact_email": "default@supp.com"})
+                supplier = Supplier(sup_data["supplier_id"], sup_data["name"], sup_data["contact_email"])
+                
+                if item.get("type") == "physical":
+                    prod = PhysicalProduct(item['id'], item['name'], item['price'], item['stock'], supplier, item['weight'])
+                elif item.get("type") == "digital":
+                    prod = DigitalProduct(item['id'], item['name'], item['price'], item['stock'], supplier, item['download_size'])
+                else:
+                    continue
+                inv.add_product(prod)
+            return inv
+    except (FileNotFoundError, json.JSONDecodeError):
+        print("inventory.json not found or corrupted. Starting with default inventory.")
+        default_supplier = Supplier("S001", "TechCorp Global", "support@techcorp.com")
+        default_items = [
+            PhysicalProduct("P001", "Gaming Laptop", 1200.00, 15, default_supplier, 2.5),
+            DigitalProduct("P002", "Antivirus Software", 25.50, 40, default_supplier, 500.0),
+            PhysicalProduct("P003", "Mechanical Keyboard", 45.00, 25, default_supplier, 1.2)
+        ]
+        for prod in default_items:
+            inv.add_product(prod)
+        return inv
+
+def save_inventory(inventory: Inventory) -> None:
+    data = [prod.to_dict() for prod in inventory.products]
+    with open('inventory.json', 'w') as file:
+        json.dump(data, file, indent=4)
+    print("Inventory saved successfully to inventory.json.")
+
+def main() -> None:
+    print("==================================================")
+    print("INVENTORY MANAGEMENT SYSTEM (LAB 8 - RELATIONS)")
+    print("==================================================")
+    inventory = load_inventory()
+
+    if inventory.products:
+        print("\n--- Testing Composition (Order & OrderLine) ---")
+        sample_order = Order("ORD-1001")
+        sample_order.add_order_line(inventory.products[0], 2)
+        if len(inventory.products) > 1:
+            sample_order.add_order_line(inventory.products[1], 1)
+        sample_order.display_order()
+
+    while True:
+        print("\n-------- MENU --------")
+        print("1. Display All Products")
+        print("2. Add Product")
+        print("3. Update Stock")
+        print("4. Search Product")
+        print("5. Save Inventory")
+        print("6. Exit")
+
+        choice = input("Enter option: ").strip()
+
+        if choice == '1':
+            inventory.display_all()
+        elif choice == '2':
+            print("\nAdd New Product\n")
+            p_type = input("Product Type ('physical' or 'digital'): ").strip().lower()
+            product_id = input("Product ID: ").strip()
+            product_name = input("Product Name: ").strip()
+            
+            sup_id = input("Supplier ID: ").strip()
+            sup_name = input("Supplier Name: ").strip()
+            sup_email = input("Supplier Email: ").strip()
+            supplier = Supplier(sup_id, sup_name, sup_email)
+
+            while True:
+                product_price = input("Price: ")
+                try:
+                    float_price = float(product_price)
+                    break
+                except ValueError:
+                    print("Invalid price, please type a number: ")
+            while True:
+                stock_quantity = input("Stock Quantity: ")
+                if stock_quantity.isdigit():
+                    int_quantity = int(stock_quantity)
+                    break
+                else:
+                    print("Invalid quantity, please type a number")
+            
+            if p_type == 'physical':
+                while True:
+                    try:
+                        weight = float(input("Weight (kg): "))
+                        break
+                    except ValueError:
+                        print("Invalid weight, enter a number.")
+                new_product = PhysicalProduct(product_id, product_name, float_price, int_quantity, supplier, weight)
+            elif p_type == 'digital':
+                while True:
+                    try:
+                        download_size = float(input("Download Size (MB): "))
+                        break
+                    except ValueError:
+                        print("Invalid size, enter a number.")
+                new_product = DigitalProduct(product_id, product_name, float_price, int_quantity, supplier, download_size)
+            else:
+                print("Unknown type. Defaulting to physical with 1kg weight.")
+                new_product = PhysicalProduct(product_id, product_name, float_price, int_quantity, supplier, 1.0)
+
+            inventory.add_product(new_product)
+            print("Product added successfully!")
+
+        elif choice == '3':
+            print("\nUpdate Stock")
+            search_id = input("Enter Product ID: ").strip()
+            prod = inventory.find_product(search_id)
+            if prod:
+                print(f"\nProduct Found: {prod.name} (Current Stock: {prod.stock})")
+                while True:
+                    new_stock = input("New Stock Quantity: ")
+                    if new_stock.isdigit():
+                        prod.update_stock(int(new_stock))
+                        print("\nStock updated successfully!")
+                        break
+                    else:
+                        print("Invalid quantity, please enter a number")
+            else:
+                print("Product not found.")
+
+        elif choice == '4':
+            print("\nSearch Product")
+            search_id = input("Enter Product ID: ").strip()
+            prod = inventory.find_product(search_id)
+            if prod:
+                print("\nProduct Found:")
+                print("--------------------------------------------------------------------------------")
+                prod.display_information()
+                print("\n--------------------------------------------------------------------------------")
+            else:
+                print("\nProduct not found.")
+
+        elif choice == '5':
+            print("Saving inventory...")
+            save_inventory(inventory)
+
+        elif choice == '6':
+            print("\nSaving inventory before exit...")
+            save_inventory(inventory)
+            print("\nThank you for using Inventory Management System.")
+            print("Program terminated.")
+            break
+        else:
+            print("Invalid option, please choose between 1 and 6.")
+
+if __name__ == "__main__":
+    main()
