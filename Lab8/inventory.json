@@ -1,0 +1,67 @@
+[
+    {
+        "id": "P001",
+        "name": "Gaming Laptop",
+        "price": 1200.0,
+        "stock": 15,
+        "supplier": {
+            "supplier_id": "S001",
+            "name": "TechCorp Global",
+            "contact_email": "support@techcorp.com"
+        },
+        "type": "physical",
+        "weight": 2.5
+    },
+    {
+        "id": "P002",
+        "name": "Antivirus Software",
+        "price": 25.5,
+        "stock": 40,
+        "supplier": {
+            "supplier_id": "S001",
+            "name": "TechCorp Global",
+            "contact_email": "support@techcorp.com"
+        },
+        "type": "digital",
+        "download_size": 500.0
+    },
+    {
+        "id": "P003",
+        "name": "Mechanical Keyboard",
+        "price": 45.0,
+        "stock": 25,
+        "supplier": {
+            "supplier_id": "S001",
+            "name": "TechCorp Global",
+            "contact_email": "support@techcorp.com"
+        },
+        "type": "physical",
+        "weight": 1.2
+    },
+    {
+        "id": "p93",
+        "name": "lolipop",
+        "price": 45.0,
+        "stock": 66,
+        "supplier": {
+            "supplier_id": "65",
+            "name": "ron",
+            "contact_email": "fon@gmail"
+        },
+        "type": "physical",
+        "weight": 90.0
+    },
+    {
+        "id": "L89",
+        "name": "GTA 6",
+        "price": 167.0,
+        "stock": 1000,
+        "supplier": {
+            "supplier_id": "R89",
+            "name": "ROCKSTAR",
+            "contact_email": "r@gmail.com"
+        },
+        "type": "digital",
+        "download_size": 87000.0
+    }
+]
