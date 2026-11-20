@@ -290,7 +290,7 @@ class Inventory:
             print(f"  -> Fulfilment Test: {prod.get_fulfilment_info()}")
 
 class ProductFactory:
-    """Centralised factory for creating Product instances."""
+    """centralised factory for creating Product instances"""
 
     @staticmethod
     def create(
@@ -312,3 +312,234 @@ class ProductFactory:
                 product_id, name, price, stock_quantity, supplier, extra_attr
             )
         raise ValueError(f"Unknown product type: {product_type}")
+
+def get_positive_float(prompt: str) -> float:
+    while True:
+        try:
+            value = float(input(prompt))
+            if value <= 0:
+                print("Please enter a number greater than zero.")
+                continue
+            return value
+        except ValueError:
+            print("Please enter a valid number, e.g. 12.50")
+
+
+def load_products(path: str, inventory: Inventory, supplier: Supplier) -> None:
+    loaded = 0
+    try:
+        file = open(path, newline="", encoding="utf-8")
+    except FileNotFoundError:
+        print(f"Products file not found: {path}")
+    else:
+        with file:
+            reader = csv.reader(file)
+            header = next(reader, None)
+            for row in reader:
+                if not row or all(cell.strip() == "" for cell in row):
+                    continue
+                try:
+                    if len(row) < 5:
+                        raise ValueError("Row must contain 5 columns.")
+                    p_type = row[0].strip()
+                    p_id = row[1].strip()
+                    p_name = row[2].strip()
+                    price = float(row[3].strip())
+                    stock = int(row[4].strip())
+                    extra = float(row[5].strip()) if len(row) > 5 and row[5].strip() else 1.0
+                    product = ProductFactory.create(
+                        p_type, p_id, p_name, price, stock, supplier, extra
+                    )
+                    inventory.add_product(product)
+                    loaded += 1
+                except ValueError as exc:
+                    print(f"Skipping invalid row {row}: {exc}")
+        print(f"{loaded} products loaded.")
+    finally:
+        print("Load attempt finished.")
+
+
+def load_inventory() -> Inventory:
+    inv = Inventory()
+    try:
+        with open("inventory.json", "r", encoding="utf-8") as file:
+            print("inventory.json found.")
+            data = json.load(file)
+            print("Inventory loaded successfully.")
+            for item in data:
+                sup_data = item.get(
+                    "supplier",
+                    {
+                        "supplier_id": "S999",
+                        "name": "Default Supplier",
+                        "contact_email": "default@supp.com",
+                    },
+                )
+                supplier = Supplier(
+                    sup_data["supplier_id"],
+                    sup_data["name"],
+                    sup_data["contact_email"],
+                )
+                p_type = item.get("type", "")
+                if p_type == "physical":
+                    extra = item.get("weight", 1.0)
+                elif p_type == "digital":
+                    extra = item.get("download_size", 100.0)
+                else:
+                    continue
+                try:
+                    prod = ProductFactory.create(
+                        p_type,
+                        item["id"],
+                        item["name"],
+                        item["price"],
+                        item["stock"],
+                        supplier,
+                        extra,
+                    )
+                    inv.add_product(prod)
+                except ValueError as exc:
+                    print(f"Skipping invalid saved item: {exc}")
+            return inv
+    except (FileNotFoundError, json.JSONDecodeError):
+        print("inventory.json not found or corrupted. Starting with default inventory.")
+        default_supplier = Supplier("S001", "TechCorp Global", "support@techcorp.com")
+        default_items = [
+            ProductFactory.create(
+                "physical", "P001", "Gaming Laptop", 1200.00, 15, default_supplier, 2.5
+            ),
+            ProductFactory.create(
+                "digital", "P002", "Antivirus Software", 25.50, 40, default_supplier, 500.0
+            ),
+            ProductFactory.create(
+                "physical", "P003", "Mechanical Keyboard", 45.00, 25, default_supplier, 1.2
+            ),
+        ]
+        for prod in default_items:
+            inv.add_product(prod)
+        return inv
+
+
+def save_inventory(inventory: Inventory) -> None:
+    data = [prod.to_dict() for prod in inventory.products]
+    with open("inventory.json", "w", encoding="utf-8") as file:
+        json.dump(data, file, indent=4)
+    print("Inventory saved successfully to inventory.json.")
+
+
+def main() -> None:
+    print("==================================================")
+    print("INVENTORY MANAGEMENT SYSTEM (LAB 9 - PATTERNS & ERRORS)")
+    print("==================================================")
+    inventory = load_inventory()
+
+    if inventory.products:
+        print("\n--- Testing Strategy & Order ---")
+        sample_order = Order("ORD-1001", discount=BulkDiscount(200, 20))
+        sample_order.add_order_line(inventory.products[0], 2)
+        if len(inventory.products) > 1:
+            sample_order.add_order_line(inventory.products[1], 1)
+        sample_order.display_order()
+
+    while True:
+        print("\n-------- MENU --------")
+        print("1. Display All Products")
+        print("2. Add Product")
+        print("3. Update Stock")
+        print("4. Search Product")
+        print("5. Save Inventory")
+        print("6. Exit")
+
+        choice = input("Enter option: ").strip()
+
+        if choice == "1":
+            inventory.display_all()
+        elif choice == "2":
+            print("\nAdd New Product\n")
+            p_type = input("Product Type ('physical' or 'digital'): ").strip().lower()
+            product_id = input("Product ID: ").strip()
+            product_name = input("Product Name: ").strip()
+
+            sup_id = input("Supplier ID: ").strip()
+            sup_name = input("Supplier Name: ").strip()
+            sup_email = input("Supplier Email: ").strip()
+            supplier = Supplier(sup_id, sup_name, sup_email)
+
+            float_price = get_positive_float("Price: ")
+            while True:
+                stock_quantity = input("Stock Quantity: ").strip()
+                if stock_quantity.isdigit():
+                    int_quantity = int(stock_quantity)
+                    break
+                print("Invalid quantity, please type a non-negative whole number.")
+
+            if p_type == "physical":
+                extra = get_positive_float("Weight (kg): ")
+            elif p_type == "digital":
+                extra = get_positive_float("Download Size (MB): ")
+            else:
+                print("Unknown type. Defaulting to physical with 1kg weight.")
+                p_type = "physical"
+                extra = 1.0
+
+            try:
+                new_product = ProductFactory.create(
+                    p_type, product_id, product_name, float_price, int_quantity, supplier, extra
+                )
+                inventory.add_product(new_product)
+                print("Product added successfully!")
+            except ValueError as exc:
+                print(f"Could not create product: {exc}")
+
+        elif choice == "3":
+            print("\nUpdate Stock")
+            search_id = input("Enter Product ID: ").strip()
+            prod = inventory.find_product(search_id)
+            if prod:
+                print(f"\nProduct Found: {prod.name} (Current Stock: {prod.stock})")
+                while True:
+                    new_stock = input("New Stock Quantity: ").strip()
+                    if new_stock.isdigit():
+                        try:
+                            prod.update_stock(int(new_stock))
+                            print("\nStock updated successfully!")
+                            break
+                        except ValueError as exc:
+                            print(exc)
+                    else:
+                        print("Invalid quantity, please enter a non-negative whole number.")
+            else:
+                print("Product not found.")
+
+        elif choice == "4":
+            print("\nSearch Product")
+            search_id = input("Enter Product ID: ").strip()
+            prod = inventory.find_product(search_id)
+            if prod:
+                print("\nProduct Found:")
+                print(
+                    "--------------------------------------------------------------------------------"
+                )
+                prod.display_information()
+                print(
+                    "\n--------------------------------------------------------------------------------"
+                )
+            else:
+                print("\nProduct not found.")
+
+        elif choice == "5":
+            print("Saving inventory...")
+            save_inventory(inventory)
+
+        elif choice == "6":
+            print("\nSaving inventory before exit...")
+            save_inventory(inventory)
+            print("\nThank you for using Inventory Management System.")
+            print("Program terminated.")
+            break
+        else:
+            print("Invalid option, please choose between 1 and 6.")
+
+
+if __name__ == "__main__":
+    main()
