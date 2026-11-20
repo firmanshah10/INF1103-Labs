@@ -27,7 +27,7 @@ class Supplier:
 
 
 class Product(ABC):
-    """abstract base class for products with supplier association"""
+    """abstract base class for products with validation and supplier association"""
 
     def __init__(
         self,
@@ -37,10 +37,17 @@ class Product(ABC):
         stock: int,
         supplier: Supplier,
     ):
+        price_val = float(price)
+        stock_val = int(stock)
+        if price_val <= 0:
+            raise ValueError("Price must be greater than zero.")
+        if stock_val < 0:
+            raise ValueError("Stock quantity cannot be negative.")
+
         self._product_id: str = product_id
         self.name: str = name
-        self._price: float = float(price)
-        self._stock: int = int(stock)
+        self._price: float = price_val
+        self._stock: int = stock_val
         self.supplier: Supplier = supplier
 
     @property
@@ -56,7 +63,10 @@ class Product(ABC):
         return self._stock
 
     def update_stock(self, quantity: int) -> None:
-        self._stock = int(quantity)
+        new_stock = int(quantity)
+        if new_stock < 0:
+            raise ValueError("Stock quantity cannot be negative.")
+        self._stock = new_stock
 
     @abstractmethod
     def get_fulfilment_info(self) -> str:
@@ -211,8 +221,11 @@ class OrderLine:
     """order line item representing product and quantity"""
 
     def __init__(self, product: Product, quantity: int):
+        qty = int(quantity)
+        if qty <= 0:
+            raise ValueError("Quantity must be greater than zero.")
         self.product: Product = product
-        self.quantity: int = int(quantity)
+        self.quantity: int = qty
 
     def calculate_subtotal(self) -> float:
         return self.product.price * self.quantity
